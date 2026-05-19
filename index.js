@@ -37,7 +37,6 @@ const verifyToken = async (req, res, next) => {
   }
   try {
     const { payload } = await jwtVerify(token, JWKS);
-    console.log(payload);
     next();
   } catch (error) {
     return res.status(403).json({ message: "Forbidden" });
@@ -50,10 +49,31 @@ const run = async () => {
     const database = client.db("idea_vault");
     const ideasCollection = database.collection("ideas");
 
-    app.get("/ideas", verifyToken, async (req, res) => {
-      const cursor = ideasCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
+    app.get("/ideas", async (req, res) => {
+      const { search } = req.query;
+      let ideas;
+      if (search) {
+        ideas = await ideasCollection.find({
+          title: {
+            $regex: search,
+            $options: "i",
+          }
+        })
+      }
+      else {
+        ideas = await ideasCollection.find();
+      }
+      const result = await ideas.toArray();
+      res.json(result);
+    });
+
+    app.get("/ideas/:ideasId", async (req, res) => {
+      const ideasId = req.params.ideasId;
+      const query = {
+        _id: new ObjectId(ideasId),
+      };
+      const result = await ideasCollection.findOne(query);
+      res.json(result);
     });
 
     app.post("/ideas", verifyToken, async (req, res) => {

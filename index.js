@@ -2,9 +2,11 @@ const dns = require("node:dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 require("dotenv").config();
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { verify } = require("node:crypto");
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
+const app = express();
 const port = process.env.PORT;
 
 app.use(cors());
@@ -20,19 +22,41 @@ const client = new MongoClient(uri, {
   },
 });
 
+const JWKS = createRemoteJWKSet(
+  new URL(`${process.env.NEXT_CLIENT_URL}/api/auth/jwks`),
+);
+
+const verifyToken = async (req, res, next) => {
+  const authHeader = req?.headers?.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+    console.log(payload);
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+};
+
 const run = async () => {
   try {
     await client.connect();
     const database = client.db("idea_vault");
     const ideasCollection = database.collection("ideas");
 
-    app.get("/ideas", async (req, res) => {
+    app.get("/ideas", verifyToken, async (req, res) => {
       const cursor = ideasCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    app.post("/ideas", async (req, res) => {
+    app.post("/ideas", verifyToken, async (req, res) => {
       const ideaData = req.body;
       const insertedIdea = await ideasCollection.insertOne(ideaData);
       res.json(insertedIdea);

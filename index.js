@@ -93,12 +93,9 @@ const run = async () => {
         _id: new ObjectId(ideasId),
       };
       const updatedIdea = req.body;
+      console.log(updatedIdea);
       const updateDoc = {
-        $set: {
-          title: updatedIdea.title,
-          description: updatedIdea.description,
-          category: updatedIdea.category,
-        },
+        $set: updatedIdea,
       };
       const result = await ideasCollection.updateOne(filter, updateDoc);
       res.json(result);
@@ -110,6 +107,7 @@ const run = async () => {
         _id: new ObjectId(ideasId),
       };
       const deleteIdea = await ideasCollection.deleteOne(query);
+      console.log(deleteIdea);
       res.json(deleteIdea);
     });
 

@@ -87,23 +87,31 @@ const run = async () => {
       res.json(result);
     });
 
-app.patch("/ideas/:ideasId", async (req, res) => {
-  const ideasId = req.params.ideasId;
-  const filter = {
-    _id: new ObjectId(ideasId),
-  };
-  const updatedIdea = req.body;
-  const updateDoc = {
-    $set: {
-      title: updatedIdea.title,
-      description: updatedIdea.description,
-      category: updatedIdea.category,
-    },
-  };
-  const result = await ideasCollection.updateOne(filter, updateDoc);
-  res.json(result);
-});
+    app.patch("/ideas/:ideasId", async (req, res) => {
+      const ideasId = req.params.ideasId;
+      const filter = {
+        _id: new ObjectId(ideasId),
+      };
+      const updatedIdea = req.body;
+      const updateDoc = {
+        $set: {
+          title: updatedIdea.title,
+          description: updatedIdea.description,
+          category: updatedIdea.category,
+        },
+      };
+      const result = await ideasCollection.updateOne(filter, updateDoc);
+      res.json(result);
+    });
 
+    app.delete("/ideas/:ideasId", async (req, res) => {
+      const ideasId = req.params.ideasId;
+      const query = {
+        _id: new ObjectId(ideasId),
+      };
+      const deleteIdea = await ideasCollection.deleteOne(query);
+      res.json(deleteIdea);
+    });
 
     app.get("/my-ideas/:userId", async (req, res) => {
       const userId = req.params.userId;

@@ -86,12 +86,15 @@ const run = async () => {
       const result = await ideasCollection.findOne(query);
       res.json(result);
     });
+    
     app.get("/my-ideas/:userId", async (req, res) => {
       const userId = req.params.userId;
-      // const query = {
-      //   userInfo.id: userId,
-      // };
+
+      const query = {
+        'userInfo.id': userId,
+      };
       const result = await ideasCollection.findOne(query);
+
       res.json(result);
     });
 

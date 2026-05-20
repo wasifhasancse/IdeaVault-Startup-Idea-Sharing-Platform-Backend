@@ -50,20 +50,31 @@ const run = async () => {
     const ideasCollection = database.collection("ideas");
 
     app.get("/ideas", async (req, res) => {
-      const { search } = req.query;
-      let ideas;
-      if (search) {
-        ideas = await ideasCollection.find({
-          title: {
-            $regex: search,
-            $options: "i",
-          }
-        })
+      const { search, category } = req.query;
+
+      if (!search && !category) {
+        const ideas = await ideasCollection.find({});
+        const result = await ideas.toArray();
+        return res.json(result);
       }
-      else {
-        ideas = await ideasCollection.find();
-      }
+      const ideas = await ideasCollection.find({
+        $or: [
+          {
+            title: {
+              $regex: search == "" ? "NOTGIVEN" : search,
+              $options: "i",
+            },
+          },
+          {
+            category: {
+              $regex: category == "" ? "NOTGIVEN" : category,
+              $options: "i",
+            },
+          },
+        ],
+      });
       const result = await ideas.toArray();
+
       res.json(result);
     });
 
@@ -72,6 +83,14 @@ const run = async () => {
       const query = {
         _id: new ObjectId(ideasId),
       };
+      const result = await ideasCollection.findOne(query);
+      res.json(result);
+    });
+    app.get("/my-ideas/:userId", async (req, res) => {
+      const userId = req.params.userId;
+      // const query = {
+      //   userInfo.id: userId,
+      // };
       const result = await ideasCollection.findOne(query);
       res.json(result);
     });

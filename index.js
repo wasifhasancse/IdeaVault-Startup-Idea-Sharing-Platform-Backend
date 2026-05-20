@@ -78,7 +78,7 @@ const run = async () => {
       res.json(result);
     });
 
-    app.get("/ideas/:ideasId", async (req, res) => {
+    app.get("/ideas/:ideasId", verifyToken, async (req, res) => {
       const ideasId = req.params.ideasId;
       const query = {
         _id: new ObjectId(ideasId),
@@ -87,7 +87,7 @@ const run = async () => {
       res.json(result);
     });
 
-    app.patch("/ideas/:ideasId", async (req, res) => {
+    app.patch("/ideas/:ideasId", verifyToken, async (req, res) => {
       const ideasId = req.params.ideasId;
       const filter = {
         _id: new ObjectId(ideasId),
@@ -113,7 +113,7 @@ const run = async () => {
       res.json(deleteIdea);
     });
 
-    app.get("/my-ideas/:userId", async (req, res) => {
+    app.get("/my-ideas/:userId", verifyToken, async (req, res) => {
       const userId = req.params.userId;
       const query = {
         "userInfo.id": userId,

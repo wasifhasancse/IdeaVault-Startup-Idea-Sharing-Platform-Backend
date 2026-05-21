@@ -45,9 +45,21 @@ const verifyToken = async (req, res, next) => {
 
 const run = async () => {
   try {
-    // await client.connect();
+    await client.connect();
     const database = client.db("idea_vault");
     const ideasCollection = database.collection("ideas");
+
+app.get("/trending-ideas", async (req, res) => {
+  // Implementation for trending ideas
+  // sort base on comments and likes
+  const trendingIdeas = await ideasCollection
+    .find({})
+    .sort({ comments: -1, likes: -1 })
+    .limit(6)
+    .toArray();
+  res.json(trendingIdeas);
+
+});
 
     app.get("/ideas", async (req, res) => {
       const { search, category } = req.query;
@@ -126,7 +138,7 @@ const run = async () => {
       res.json(insertedIdea);
     });
 
-    // await client.db("admin").command({ ping: 1 });
+    await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );

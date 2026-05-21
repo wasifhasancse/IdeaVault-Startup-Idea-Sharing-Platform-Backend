@@ -45,7 +45,7 @@ const verifyToken = async (req, res, next) => {
 
 const run = async () => {
   try {
-    await client.connect();
+    // await client.connect();
     const database = client.db("idea_vault");
     const ideasCollection = database.collection("ideas");
 
@@ -126,7 +126,7 @@ const run = async () => {
       res.json(insertedIdea);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );

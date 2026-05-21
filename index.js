@@ -49,17 +49,16 @@ const run = async () => {
     const database = client.db("idea_vault");
     const ideasCollection = database.collection("ideas");
 
-app.get("/trending-ideas", async (req, res) => {
-  // Implementation for trending ideas
-  // sort base on comments and likes
-  const trendingIdeas = await ideasCollection
-    .find({})
-    .sort({ comments: -1, likes: -1 })
-    .limit(6)
-    .toArray();
-  res.json(trendingIdeas);
-
-});
+    app.get("/trending-ideas", async (req, res) => {
+      // Implementation for trending ideas
+      // sort base on comments and likes
+      const trendingIdeas = await ideasCollection
+        .find({})
+        .sort({ comments: -1, likes: -1 })
+        .limit(6)
+        .toArray();
+      res.json(trendingIdeas);
+    });
 
     app.get("/ideas", async (req, res) => {
       const { search, category } = req.query;
